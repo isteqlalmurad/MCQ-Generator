@@ -195,7 +195,7 @@
             const item = historyItems.find(item => item.id === itemId);
             if (item && item.questionData) {
                 const encodedQuestions = encodeURIComponent(JSON.stringify(item.questionData));
-                window.location.href = `/Users/murad/Downloads/med-web-app/pages/mcq-list.html?loadSaved=${encodedQuestions}`;
+                window.location.href = `./mcq-list.html?loadSaved=${encodedQuestions}`;
             }
         }
     
