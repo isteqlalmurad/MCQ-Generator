@@ -143,7 +143,7 @@
             container.innerHTML = items.map(item => `
                 <div class="bg-white rounded-lg shadow history-item">
                     <div class="flex items-center gap-4" onclick="viewQuestions(${item.id})" style="cursor: pointer;">
-                        <img src="/Users/murad/Downloads/med-web-app/assets/istockphoto-1283801280-612x612.jpg" alt="${item.title}" class="w-60 h-40 object-cover rounded-l-lg">
+                        <img src="../assets/istockphoto-1283801280-612x612.jpg" alt="${item.title}" class="w-60 h-40 object-cover rounded-l-lg">
                         <div class="flex-1 p-4">
                             <div class="text-sm text-gray-500 mb-1">
                                 ${formatTimestamp(item.timestamp)} • ${item.questions} questions
