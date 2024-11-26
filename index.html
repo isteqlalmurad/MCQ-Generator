@@ -536,7 +536,7 @@
         let currentQuestions = [];
 
         function navigateToLibrary() {
-            window.location.href = '/Users/murad/Downloads/med-web-app/pages/mcq-library.html';
+            window.location.href = './pages/mcq-library.html';
         }
 
         function showExtraInfo() {
@@ -550,7 +550,7 @@
             const maxQuestions = encodeURIComponent(document.getElementById('maxQuestions').value);
 
             // Create URL with parameters
-            const url = `/Users/murad/Downloads/med-web-app/pages/mcq-list.html?` +
+            const url = `./pages/mcq-list.html?` +
                 `topic=${content}&` +
                 `difficulty=${difficulty}&` +
                 `maxQuestions=${maxQuestions}`;
