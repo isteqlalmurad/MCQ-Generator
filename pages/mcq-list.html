@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base href="/" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ List</title>
+    <style>
+        /* Header button styles */
+        .header-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .btn-library {
+            padding: 8px 16px;
+            background-color: white;
+            color: #4F46E5;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            /* Add these new properties */
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-create {
+            padding: 8px 16px;
+            background-color: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-create:hover {
+            background-color: #4338CA;
+        }
+
+        .btn-library:hover {
+            background-color: #F9FAFB;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --secondary: #6B7280;
+            --success: #10B981;
+            --danger: #EF4444;
+            --background: #F9FAFB;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--background);
+        }
+
+        .mcq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .show-answers-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .show-answers-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .question-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background: #F3F4F6;
+        }
+
+        .option.correct {
+            background: #D1FAE5;
+            border-color: #34D399;
+        }
+
+        .option.incorrect {
+            background: #FEE2E2;
+            border-color: #F87171;
+        }
+
+        .explanation {
+            margin-top: 16px;
+            padding: 16px;
+            background: #EFF6FF;
+            border-radius: 6px;
+        }
+
+        .feedback {
+            margin-top: 12px;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #D1FAE5;
+            color: #047857;
+        }
+
+        .feedback.incorrect {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        /* Loading state styles */
+        .loading-state {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .spinner {
+            border: 4px solid #E5E7EB;
+            border-top: 4px solid #4F46E5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            background: #FEE2E2;
+            border: 1px solid #EF4444;
+            border-radius: 8px;
+            margin: 1rem;
+        }
+
+        .error-message button {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #4F46E5;
+            color: white;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-buttons">
+        <button class="btn-library" onclick="navigateToLibrary()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="btn-icon">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+            <span>My Library</span>
+        </button>
+        <button class="btn-create" onclick="navigateToCreate()">+ Generate</button>
+    </div>
+
+    <div class="mcq-container" id="mcq-app"></div>
+
+    <script>
+        // API Configuration
+        const k_1 = 'sk-proj-IjbnbvKdX6QNWEeONkMomf5Bbk2JIdI5gnflfZD8iBQ13sd5_GdfUOWYk_'
+        const k_2 = 'T3BlbkFJbR2HjOD6gNlqutM0Mlba0szn9u9cLL1Nuqm9axLl-O6veJ06WvV5pP5MUA'
+        const fk_3 = k_1 + k_2;
+        const CONFIG = {
+            API_ENDPOINT: 'https://api.openai.com/v1/chat/completions',
+
+
+
+            API_KEY: fk_3,
+        };
+
+        // Navigation functions
+        function navigateToLibrary() {
+            window.location.href = '/Users/murad/Downloads/med-web-app/pages/mcq-library.html';
+        }
+
+        function navigateToCreate() {
+            window.location.href = '/Users/murad/Downloads/med-web-app/index.html';
+        }
+
+
+        class MCQApp {
+            constructor(container, questions = initialQuestions) {
+                this.container = container;
+                this.questions = questions;
+                this.showAnswers = false;
+                this.answers = {};
+                this.feedback = {};
+
+                this.render();
+                this.attachEventListeners();
+            }
+
+            handleAnswerSelect(questionId, selectedOption) {
+                const question = this.questions.find(q => q.id === questionId);
+                const correctOption = question.options.find(opt => opt.correct);
+                const isCorrect = correctOption.id === selectedOption;
+
+                this.answers[questionId] = {
+                    selected: selectedOption,
+                    correct: isCorrect,
+                    revealed: isCorrect
+                };
+
+                this.feedback[questionId] = {
+                    message: isCorrect ? "Correct!" : "Whoops! Wrong one, try another one",
+                    isCorrect
+                };
+
+                this.render();
+            }
+
+            toggleShowAnswers() {
+                this.showAnswers = !this.showAnswers;
+                if (this.showAnswers) {
+                    this.questions.forEach(question => {
+                        const correctOption = question.options.find(opt => opt.correct);
+                        this.answers[question.id] = {
+                            selected: correctOption.id,
+                            correct: true,
+                            revealed: true
+                        };
+                    });
+                    this.feedback = {};
+                } else {
+                    this.answers = {};
+                    this.feedback = {};
+                }
+                this.render();
+            }
+
+            render() {
+                const html = `
+                    <div class="header">
+                        <h1>Medical MCQs</h1>
+                        <button class="show-answers-btn" id="show-answers">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            ${this.showAnswers ? 'Hide Answers' : 'Show Answers'}
+                        </button>
+                    </div>
+
+                    ${this.questions.map((question, index) => `
+                        <div class="question-card">
+                            <h3>${index + 1}. ${question.stem}</h3>
+                            <p>${question.leadIn}</p>
+                            
+                            <div class="options">
+                                ${question.options.map(option => {
+                    const isSelected = this.answers[question.id]?.selected === option.id;
+                    const isCorrect = option.correct;
+                    const isRevealed = this.showAnswers || this.answers[question.id]?.revealed;
+
+                    let className = 'option';
+                    if (isRevealed && isCorrect) className += ' correct';
+                    if (isSelected && !isCorrect) className += ' incorrect';
+
+                    return `
+                                        <div class="${className}" data-question="${question.id}" data-option="${option.id}">
+                                            <input type="radio" 
+                                                name="question-${question.id}" 
+                                                value="${option.id}"
+                                                ${isSelected ? 'checked' : ''}
+                                            >
+                                            <label>${option.id}) ${option.text}</label>
+                                            ${isRevealed && isCorrect ? '<span>✓</span>' : ''}
+                                        </div>
+                                    `;
+                }).join('')}
+                            </div>
+
+                            ${this.feedback[question.id] ? `
+                                <div class="feedback ${this.feedback[question.id].isCorrect ? 'correct' : 'incorrect'}">
+                                    ${this.feedback[question.id].message}
+                                </div>
+                            ` : ''}
+
+                            ${(this.showAnswers || this.answers[question.id]?.revealed) ? `
+                                <div class="explanation">
+                                    <h4>Explanation:</h4>
+                                    <p>${question.explanation}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                `;
+
+                this.container.innerHTML = html;
+            }
+
+            attachEventListeners() {
+                this.container.addEventListener('click', (e) => {
+                    if (e.target.closest('#show-answers')) {
+                        this.toggleShowAnswers();
+                    }
+
+                    const optionEl = e.target.closest('.option');
+                    if (optionEl) {
+                        const questionId = optionEl.dataset.question;
+                        const optionId = optionEl.dataset.option;
+                        this.handleAnswerSelect(questionId, optionId);
+                    }
+                });
+            }
+        }
+
+        // Function to generate MCQs from URL parameters
+        // Add this function after successful MCQ generation
+        function saveToLibrary(questions, topic) {
+            const historyItem = {
+                id: Date.now(), // Unique ID using timestamp
+                title: topic,
+                timestamp: new Date().toISOString(),
+                questions: questions.length,
+                description: `Generated ${questions.length} questions about ${topic}`,
+                questionData: questions, // Store actual questions
+                thumbnail: '/api/placeholder/240/160'
+            };
+
+            // Get existing history from localStorage
+            let historyItems = JSON.parse(localStorage.getItem('mcqHistory') || '[]');
+
+            // Add new item to history
+            historyItems.unshift(historyItem); // Add to beginning of array
+
+            // Save back to localStorage
+            localStorage.setItem('mcqHistory', JSON.stringify(historyItems));
+        }// Replace the generateMCQs function with this updated version:
+
+
+        async function generateMCQs() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const topic = decodeURIComponent(urlParams.get('topic') || '');
+            const difficulty = decodeURIComponent(urlParams.get('difficulty') || 'medium');
+            const maxQuestions = decodeURIComponent(urlParams.get('maxQuestions') || 'auto');
+
+            document.getElementById('mcq-app').innerHTML = `
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Generating questions about ${topic}...</p>
+        </div>
+    `;
+
+            if (!topic) {
+                document.getElementById('mcq-app').innerHTML = `
+            <div class="error-message">
+                <h3>Error: No topic specified</h3>
+                <button onclick="window.location.href='/Users/murad/Downloads/med-web-app/index.html'">
+                    Return to Question Generator
+                </button>
+            </div>
+        `;
+                return;
+            }
+
+            const prompt = `Generate ${maxQuestions === 'auto' ? '3' : maxQuestions} ${difficulty} level multiple choice questions about ${topic} for medical students.
+    Return ONLY a JSON array of questions. randomize the position of correct question. with no additional text or explanation. Format:
+
+    [
+    {
+        "id": "1",
+        "stem": "clinical scenario or question stem",
+        "leadIn": "specific question",
+        "options": [
+            { "id": "A", "text": "option text", "correct": true },
+            { "id": "B", "text": "option text", "correct": false },
+            { "id": "C", "text": "option text", "correct": false },
+            { "id": "D", "text": "option text", "correct": false }
+        ],
+        "explanation": "detailed explanation of the correct answer"
+    }
+   ]
+
+    Guidelines:
+    - ${difficulty} level difficulty
+    - First-year medical student content
+    - No additional text before or after the JSON
+    - Ensure valid JSON format`;
+
+            try {
+                const response = await fetch(CONFIG.API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${CONFIG.API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4o-mini",
+                        messages: [{
+                            role: "system",
+                            content: "You are a medical MCQ generator. Always respond with properly formatted JSON array of questions only. No additional text."
+                        }, {
+                            role: "user",
+                            content: prompt
+                        }],
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+
+                try {
+                    const responseContent = data.choices[0].message.content;
+                    console.log('API Response:', responseContent); // For debugging
+
+                    // Clean the response string to ensure it's valid JSON
+                    const cleanedResponse = responseContent.trim().replace(/^```json\n?|\n?```$/g, '');
+                    const generatedQuestions = JSON.parse(cleanedResponse);
+
+                    if (!Array.isArray(generatedQuestions)) {
+                        throw new Error('Response is not an array of questions');
+                    }
+
+                    // Validate question format
+                    generatedQuestions.forEach((q, index) => {
+                        if (!q.id || !q.stem || !q.leadIn || !Array.isArray(q.options) || !q.explanation) {
+                            throw new Error(`Invalid question format at index ${index}`);
+                        }
+                    });
+
+
+
+                    // Save to library after successful generation
+
+                    // Initialize the MCQ app with the generated questions
+                    new MCQApp(document.getElementById('mcq-app'), generatedQuestions);
+                    saveToLibrary(generatedQuestions, topic);
+
+                } catch (parseError) {
+                    console.error('Parse Error:', parseError);
+                    console.log('Failed Response:', data.choices[0].message.content);
+                    throw new Error('Invalid response format - Please try again');
+                }
+
+            } catch (error) {
+                console.error('Error generating MCQs:', error);
+                document.getElementById('mcq-app').innerHTML = `
+            <div class="error-message">
+                <h3>Error generating questions</h3>
+                <p>${error.message}</p>
+                <p>Falling back to sample questions...</p>
+            </div>
+        `;
+                setTimeout(() => {
+                    new MCQApp(document.getElementById('mcq-app'));
+                }, 2000);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Check for saved questions first
+            const savedQuestions = urlParams.get('loadSaved');
+            if (savedQuestions) {
+                try {
+                    const questions = JSON.parse(decodeURIComponent(savedQuestions));
+                    new MCQApp(document.getElementById('mcq-app'), questions);
+                } catch (error) {
+                    console.error('Error loading saved questions:', error);
+                    new MCQApp(document.getElementById('mcq-app'));
+                }
+            }
+            // Otherwise, check for generation parameters
+            else if (urlParams.has('topic')) {
+                generateMCQs();
+            }
+            // Fall back to initial questions
+            else {
+                new MCQApp(document.getElementById('mcq-app'));
+            }
+        });
+
+    </script>
+</body>
+
+</html>
