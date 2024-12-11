@@ -227,27 +227,42 @@
     <div class="mcq-container" id="mcq-app"></div>
 
     <script>
-        // API Configuration
         const k_1 = 'sk-proj-IjbnbvKdX6QNWEeONkMomf5Bbk2JIdI5gnflfZD8iBQ13sd5_GdfUOWYk_'
         const k_2 = 'T3BlbkFJbR2HjOD6gNlqutM0Mlba0szn9u9cLL1Nuqm9axLl-O6veJ06WvV5pP5MUA'
         const fk_3 = k_1 + k_2;
         const CONFIG = {
             API_ENDPOINT: 'https://api.openai.com/v1/chat/completions',
-
-
-
             API_KEY: fk_3,
         };
 
         // Navigation functions
         function navigateToLibrary() {
-            window.location.href = './pages/mcq-library.html';
+            window.location.href = '/Users/murad/Downloads/med-web-app/pages/mcq-library.html';
         }
 
         function navigateToCreate() {
-            window.location.href = '../index.html';
+            window.location.href = '/Users/murad/Downloads/med-web-app/index.html';
         }
 
+        // Randomization helper functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function getRandomizedOptionsTemplate() {
+            const template = [
+                { "id": "A", "text": "OPTION_TEXT", "correct": true },
+                { "id": "B", "text": "OPTION_TEXT", "correct": false },
+                { "id": "C", "text": "OPTION_TEXT", "correct": false },
+                { "id": "D", "text": "OPTION_TEXT", "correct": false },
+                { "id": "E", "text": "OPTION_TEXT", "correct": false }
+            ];
+            return shuffleArray([...template]);
+        }
 
         class MCQApp {
             constructor(container, questions = initialQuestions) {
@@ -301,24 +316,23 @@
 
             render() {
                 const html = `
-                    <div class="header">
-                        <h1>Medical MCQs</h1>
-                        <button class="show-answers-btn" id="show-answers">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                            ${this.showAnswers ? 'Hide Answers' : 'Show Answers'}
-                        </button>
-                    </div>
+            <div class="header">
+                <h1>Medical MCQs</h1>
+                <button class="show-answers-btn" id="show-answers">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    ${this.showAnswers ? 'Hide Answers' : 'Show Answers'}
+                </button>
+            </div>
 
-                    ${this.questions.map((question, index) => `
-                        <div class="question-card">
-                            <h3>${index + 1}. ${question.stem}</h3>
-                            <p>${question.leadIn}</p>
-                            
-                            <div class="options">
-                                ${question.options.map(option => {
+            ${this.questions.map((question, index) => `
+                <div class="question-card">
+                    <h3>${index + 1}. ${question.stem}</h3>
+                    
+                    <div class="options">
+                        ${question.options.map(option => {
                     const isSelected = this.answers[question.id]?.selected === option.id;
                     const isCorrect = option.correct;
                     const isRevealed = this.showAnswers || this.answers[question.id]?.revealed;
@@ -328,34 +342,34 @@
                     if (isSelected && !isCorrect) className += ' incorrect';
 
                     return `
-                                        <div class="${className}" data-question="${question.id}" data-option="${option.id}">
-                                            <input type="radio" 
-                                                name="question-${question.id}" 
-                                                value="${option.id}"
-                                                ${isSelected ? 'checked' : ''}
-                                            >
-                                            <label>${option.id}) ${option.text}</label>
-                                            ${isRevealed && isCorrect ? '<span>✓</span>' : ''}
-                                        </div>
-                                    `;
+                                <div class="${className}" data-question="${question.id}" data-option="${option.id}">
+                                    <input type="radio" 
+                                        name="question-${question.id}" 
+                                        value="${option.id}"
+                                        ${isSelected ? 'checked' : ''}
+                                    >
+                                    <label>${option.id}) ${option.text}</label>
+                                    ${isRevealed && isCorrect ? '<span>✓</span>' : ''}
+                                </div>
+                            `;
                 }).join('')}
-                            </div>
+                    </div>
 
-                            ${this.feedback[question.id] ? `
-                                <div class="feedback ${this.feedback[question.id].isCorrect ? 'correct' : 'incorrect'}">
-                                    ${this.feedback[question.id].message}
-                                </div>
-                            ` : ''}
-
-                            ${(this.showAnswers || this.answers[question.id]?.revealed) ? `
-                                <div class="explanation">
-                                    <h4>Explanation:</h4>
-                                    <p>${question.explanation}</p>
-                                </div>
-                            ` : ''}
+                    ${this.feedback[question.id] ? `
+                        <div class="feedback ${this.feedback[question.id].isCorrect ? 'correct' : 'incorrect'}">
+                            ${this.feedback[question.id].message}
                         </div>
-                    `).join('')}
-                `;
+                    ` : ''}
+
+                    ${(this.showAnswers || this.answers[question.id]?.revealed) ? `
+                        <div class="explanation">
+                            <h4>Explanation:</h4>
+                            <p>${question.explanation}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('')}
+        `;
 
                 this.container.innerHTML = html;
             }
@@ -376,29 +390,21 @@
             }
         }
 
-        // Function to generate MCQs from URL parameters
-        // Add this function after successful MCQ generation
         function saveToLibrary(questions, topic) {
             const historyItem = {
-                id: Date.now(), // Unique ID using timestamp
+                id: Date.now(),
                 title: topic,
                 timestamp: new Date().toISOString(),
                 questions: questions.length,
                 description: `Generated ${questions.length} questions about ${topic}`,
-                questionData: questions, // Store actual questions
+                questionData: questions,
                 thumbnail: '/api/placeholder/240/160'
             };
 
-            // Get existing history from localStorage
             let historyItems = JSON.parse(localStorage.getItem('mcqHistory') || '[]');
-
-            // Add new item to history
-            historyItems.unshift(historyItem); // Add to beginning of array
-
-            // Save back to localStorage
+            historyItems.unshift(historyItem);
             localStorage.setItem('mcqHistory', JSON.stringify(historyItems));
-        }// Replace the generateMCQs function with this updated version:
-
+        }
 
         async function generateMCQs() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -425,27 +431,29 @@
                 return;
             }
 
-            const prompt = `Generate ${maxQuestions === 'auto' ? '3' : maxQuestions} ${difficulty} level multiple choice questions about ${topic} for medical students.
-    Return ONLY a JSON array of questions. randomize the position of correct question. with no additional text or explanation. Format:
+            // Generate randomized option templates for each question
+            const numQuestions = maxQuestions === 'auto' ? 5 : parseInt(maxQuestions);
+            const optionsTemplates = Array(numQuestions).fill(null).map(() => getRandomizedOptionsTemplate());
+
+            const prompt = `Generate ${numQuestions} ${difficulty} level multiple choice questions about ${topic} for medical students.
+    Return ONLY a JSON array of questions with no additional text or explanation. 
+    For each question, use the exact option order provided below, replacing only the "OPTION_TEXT" placeholders with appropriate content.
 
     [
-    {
-        "id": "1",
+    ${optionsTemplates.map((options, index) => `{
+        "id": "${index + 1}",
         "stem": "clinical scenario or question stem",
-        "leadIn": "specific question",
-        "options": [
-            { "id": "A", "text": "option text", "correct": true },
-            { "id": "B", "text": "option text", "correct": false },
-            { "id": "C", "text": "option text", "correct": false },
-            { "id": "D", "text": "option text", "correct": false }
-        ],
+        "options": ${JSON.stringify(options, null, 2)},
         "explanation": "detailed explanation of the correct answer"
-    }
-   ]
+    }`).join(',\n')}
+    ]
 
     Guidelines:
     - ${difficulty} level difficulty
     - First-year medical student content
+    - Keep the exact order of options as provided above for each question
+    - Replace only the "OPTION_TEXT" placeholders
+    - Keep the "correct" boolean values exactly as provided
     - No additional text before or after the JSON
     - Ensure valid JSON format`;
 
@@ -477,9 +485,8 @@
 
                 try {
                     const responseContent = data.choices[0].message.content;
-                    console.log('API Response:', responseContent); // For debugging
+                    console.log('API Response:', responseContent);
 
-                    // Clean the response string to ensure it's valid JSON
                     const cleanedResponse = responseContent.trim().replace(/^```json\n?|\n?```$/g, '');
                     const generatedQuestions = JSON.parse(cleanedResponse);
 
@@ -487,18 +494,21 @@
                         throw new Error('Response is not an array of questions');
                     }
 
-                    // Validate question format
+                    // Validate question format and number of options
                     generatedQuestions.forEach((q, index) => {
-                        if (!q.id || !q.stem || !q.leadIn || !Array.isArray(q.options) || !q.explanation) {
+                        if (!q.id || !q.stem || !Array.isArray(q.options) || !q.explanation) {
                             throw new Error(`Invalid question format at index ${index}`);
+                        }
+                        if (q.options.length !== 5) {
+                            throw new Error(`Question ${index + 1} does not have exactly 5 options`);
+                        }
+                        // Verify the correct/incorrect distribution matches our template
+                        const correctCount = q.options.filter(opt => opt.correct).length;
+                        if (correctCount !== 1) {
+                            throw new Error(`Question ${index + 1} does not have exactly one correct answer`);
                         }
                     });
 
-
-
-                    // Save to library after successful generation
-
-                    // Initialize the MCQ app with the generated questions
                     new MCQApp(document.getElementById('mcq-app'), generatedQuestions);
                     saveToLibrary(generatedQuestions, topic);
 
@@ -522,10 +532,10 @@
                 }, 2000);
             }
         }
+
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
 
-            // Check for saved questions first
             const savedQuestions = urlParams.get('loadSaved');
             if (savedQuestions) {
                 try {
@@ -536,11 +546,9 @@
                     new MCQApp(document.getElementById('mcq-app'));
                 }
             }
-            // Otherwise, check for generation parameters
             else if (urlParams.has('topic')) {
                 generateMCQs();
             }
-            // Fall back to initial questions
             else {
                 new MCQApp(document.getElementById('mcq-app'));
             }
