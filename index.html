@@ -38,6 +38,51 @@
             overflow: hidden;
         }
 
+        /* Auth Overlay Styles */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--surface-900);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .auth-container {
+            background: var(--surface-800);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-logo {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .auth-title {
+            color: var(--white);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #password {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--surface-700);
+            background: var(--surface-900);
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        /* Original App Styles */
         .app-container {
             display: flex;
             height: 100vh;
@@ -306,31 +351,6 @@
             font-weight: bold;
         }
 
-        .error-message {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background: var(--error);
-            color: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            z-index: 50;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
         @media (max-width: 1400px) {
             .steps-container {
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -389,177 +409,218 @@
 </head>
 
 <body>
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo-section">
-                <div class="logo-container">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                    </svg>
-                </div>
-                <h1 class="app-title">UoD Medicine AI-Bot</h1>
+    <!-- Auth Overlay -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Topic</label>
-                <textarea id="content" class="input-field" placeholder="Enter your medical topic here..."></textarea>
-                <div class="char-count">0 / 5,000</div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Difficulty Level</label>
-                <select id="difficulty" class="input-field">
-                    <option value="basic">Basic</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Number of Questions</label>
-                <select id="maxQuestions" class="input-field">
-                    <option value="auto">Auto</option>
-                    <option value="5">5 Questions</option>
-                    <option value="10">10 Questions</option>
-                    <option value="15">15 Questions</option>
-                </select>
-            </div>
-
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="generateQuestions()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path
-                            d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-                    </svg>
-                    Generate Questions
-                </button>
-
-                <button class="btn btn-secondary" onclick="navigateToLibrary()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                    </svg>
-                    My Library
-                </button>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <div class="inner-content">
-                <div class="welcome-card">
-                    <div class="welcome-header">
-                        <svg class="welcome-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                        </svg>
-                        <div>
-                            <h2 class="welcome-title">Medical MCQ Generator</h2>
-                            <p class="welcome-subtitle">How to Generate exam-style questions for Dundee Medical School
-                                Year 1</p>
-                        </div>
-                    </div>
-                    <div class="steps-container">
-                        <div class="step">
-                            <div class="step-header">
-                                <div class="step-number">1</div>
-                                <h3 class="step-title">Choose Your Topic</h3>
-                            </div>
-                            <div class="step-content">
-                                <p>Select from a wide range of first-year medical subjects:</p>
-                                <ul>
-                                    <li>Anatomy & Physiology</li>
-                                    <li>Cell Biology & Genetics</li>
-                                    <li>Biochemistry & Metabolism</li>
-                                    <li>Clinical Skills</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="step">
-                            <div class="step-header">
-                                <div class="step-number">2</div>
-                                <h3 class="step-title">Set Difficulty</h3>
-                            </div>
-                            <div class="step-content">
-                                <p>Choose your preferred difficulty level:</p>
-                                <ul>
-                                    <li>Basic: Knowledge recall</li>
-                                    <li>Medium: Understanding & application</li>
-                                    <li>Hard: Clinical scenarios</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="step">
-                            <div class="step-header">
-                                <div class="step-number">3</div>
-                                <h3 class="step-title">Generate MCQs</h3>
-                            </div>
-                            <div class="step-content">
-                                <p>Get instant access to:</p>
-                                <ul>
-                                    <li>Custom MCQ sets</li>
-                                    <li>Detailed explanations</li>
-                                    <li>Progress tracking</li>
-                                    <li>Save to your library</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-header">
-                                <div class="step-number">4</div>
-                                <h3 class="step-title">Library</h3>
-                            </div>
-                            <div class="step-content">
-                                <p>Access history:</p>
-                                <ul>
-                                    <li>All MCQs generated to date</li>
-                                    <li>Stored in one place</li>
-                                    <li>Search through history</li>
-                                    <li>Download, delete or edit description</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-
-
-            </div>
+            <h2 class="auth-title">UoD Medicine AI-Bot</h2>
+            <input type="password" id="password" placeholder="Enter password" />
+            <button class="btn btn-primary" onclick="authenticate()">Access System</button>
+        </div>
     </div>
-    </main>
+
+    <!-- Main App Content -->
+    <div id="appContent" style="display: none;">
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="logo-section">
+                    <div class="logo-container">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                    <h1 class="app-title">UoD Medicine AI-Bot</h1>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Topic</label>
+                    <textarea id="content" class="input-field"
+                        placeholder="Enter your medical topic here..."></textarea>
+                    <div class="char-count">0 / 5,000</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Difficulty Level</label>
+                    <select id="difficulty" class="input-field">
+                        <option value="basic">Basic</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Number of Questions</label>
+                    <select id="maxQuestions" class="input-field">
+                        <option value="auto">Auto</option>
+                        <option value="5">5 Questions</option>
+                        <option value="10">10 Questions</option>
+                        <option value="15">15 Questions</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="generateQuestions()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                        </svg>
+                        Generate Questions
+                    </button>
+
+                    <button class="btn btn-secondary" onclick="navigateToLibrary()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
+                        My Library
+                    </button>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="inner-content">
+                    <div class="welcome-card">
+                        <div class="welcome-header">
+                            <svg class="welcome-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                            </svg>
+                            <div>
+                                <h2 class="welcome-title">Medical MCQ Generator</h2>
+                                <p class="welcome-subtitle">How to Generate exam-style questions for Dundee Medical
+                                    School
+                                    Year 1</p>
+                            </div>
+                        </div>
+                        <div class="steps-container">
+                            <div class="step">
+                                <div class="step-header">
+                                    <div class="step-number">1</div>
+                                    <h3 class="step-title">Choose Your Topic</h3>
+                                </div>
+                                <div class="step-content">
+                                    <p>Select from a wide range of first-year medical subjects:</p>
+                                    <ul>
+                                        <li>Anatomy & Physiology</li>
+                                        <li>Cell Biology & Genetics</li>
+                                        <li>Biochemistry & Metabolism</li>
+                                        <li>Clinical Skills</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-header">
+                                    <div class="step-number">2</div>
+                                    <h3 class="step-title">Set Difficulty</h3>
+                                </div>
+                                <div class="step-content">
+                                    <p>Choose your preferred difficulty level:</p>
+                                    <ul>
+                                        <li>Basic: Knowledge recall</li>
+                                        <li>Medium: Understanding & application</li>
+                                        <li>Hard: Clinical scenarios</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-header">
+                                    <div class="step-number">3</div>
+                                    <h3 class="step-title">Generate MCQs</h3>
+                                </div>
+                                <div class="step-content">
+                                    <p>Get instant access to:</p>
+                                    <ul>
+                                        <li>Custom MCQ sets</li>
+                                        <li>Detailed explanations</li>
+                                        <li>Progress tracking</li>
+                                        <li>Save to your library</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-header">
+                                    <div class="step-number">4</div>
+                                    <h3 class="step-title">Library</h3>
+                                </div>
+                                <div class="step-content">
+                                    <p>Access history:</p>
+                                    <ul>
+                                        <li>All MCQs generated to date</li>
+                                        <li>Stored in one place</li>
+                                        <li>Search through history</li>
+                                        <li>Download, delete or edit description</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>
+        // Obfuscated password verification
+        const _0x4e8b = ['cmVwbGFjZQ==', 'Y2hhckNvZGVBdA==', 'bWF0Y2g=', 'ZnJvbUNoYXJDb2Rl', 'am9pbg==']; (function (_0x39cced, _0x4e8b89) { const _0x47e243 = function (_0x461766) { while (--_0x461766) { _0x39cced['push'](_0x39cced['shift']()); } }; _0x47e243(++_0x4e8b89); }(_0x4e8b, 0x1b3)); const _0x47e2 = function (_0x39cced, _0x4e8b89) { _0x39cced = _0x39cced - 0x0; let _0x47e243 = _0x4e8b[_0x39cced]; if (_0x47e2['QEwPRk'] === undefined) { (function () { const _0x1d8f06 = function () { let _0x1f99a9; try { _0x1f99a9 = Function('return\x20(function()\x20' + '{}.constructor(\x22return\x20this\x22)(\x20)' + ');')(); } catch (_0x319992) { _0x1f99a9 = window; } return _0x1f99a9; }; const _0x47aa2d = _0x1d8f06(); const _0x3f2e96 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='; _0x47aa2d['atob'] || (_0x47aa2d['atob'] = function (_0x1c7e70) { const _0x47e243 = String(_0x1c7e70)['replace'](/=+$/, ''); let _0x461766 = ''; for (let _0x47aa2d = 0x0, _0x3f2e96, _0x1d8f06, _0x1f99a9 = 0x0; _0x1d8f06 = _0x47e243['charAt'](_0x1f99a9++); ~_0x1d8f06 && (_0x3f2e96 = _0x47aa2d % 0x4 ? _0x3f2e96 * 0x40 + _0x1d8f06 : _0x1d8f06, _0x47aa2d++ % 0x4) ? _0x461766 += String['fromCharCode'](0xff & _0x3f2e96 >> (-0x2 * _0x47aa2d & 0x6)) : 0x0) { _0x1d8f06 = _0x3f2e96['indexOf'](_0x1d8f06); } return _0x461766; }); }()); _0x47e2['tHEncw'] = function (_0x319992) { const _0x1c7e70 = atob(_0x319992); let _0x47e243 = ''; for (let _0x461766 = 0x0, _0x47aa2d = _0x1c7e70['length']; _0x461766 < _0x47aa2d; _0x461766++) { _0x47e243 += '%' + ('00' + _0x1c7e70['charCodeAt'](_0x461766)['toString'](0x10))['slice'](-0x2); } return decodeURIComponent(_0x47e243); }; _0x47e2['pRzGMA'] = {}; _0x47e2['QEwPRk'] = !![]; } const _0x461766 = _0x47e2['pRzGMA'][_0x39cced]; if (_0x461766 === undefined) { _0x47e243 = _0x47e2['tHEncw'](_0x47e243); _0x47e2['pRzGMA'][_0x39cced] = _0x47e243; } else { _0x47e243 = _0x461766; } return _0x47e243; };
+
+        function authenticate() {
+            const input = document.getElementById('password').value;
+            const hashKey = [68, 117, 110, 100, 101, 101, 77, 101, 100, 50, 48, 50, 52];
+            const hashedInput = Array.from(input).map(char => char.charCodeAt(0));
+
+            if (hashedInput.length === hashKey.length && hashedInput.every((val, idx) => val === hashKey[idx])) {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                sessionStorage.setItem('auth', btoa(Date.now().toString()));
+            } else {
+                alert('Invalid password');
+            }
+        }
+
+        // Check authentication on page load
+        window.onload = function () {
+            const auth = sessionStorage.getItem('auth');
+            if (auth && atob(auth) > Date.now() - 3600000) {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+            }
+        };
+
+        // Prevent inspection shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+                e.preventDefault();
+            }
+        });
+
         let currentQuestions = [];
 
         function navigateToLibrary() {
-            window.location.href = './pages/mcq-library.html';
+            window.location.href = '/Users/murad/Downloads/med-web-app/pages/mcq-library.html';
         }
-
-        function showExtraInfo() {
-            alert('Extra information and resources will be displayed here.');
-        }
-
 
         function generateQuestions() {
             const content = encodeURIComponent(document.getElementById('content').value);
             const difficulty = encodeURIComponent(document.getElementById('difficulty').value);
             const maxQuestions = encodeURIComponent(document.getElementById('maxQuestions').value);
 
-            // Create URL with parameters
-            const url = `./pages/mcq-list.html?` +
+            const url = `/Users/murad/Downloads/med-web-app/pages/mcq-list.html?` +
                 `topic=${content}&` +
                 `difficulty=${difficulty}&` +
                 `maxQuestions=${maxQuestions}`;
 
-            // Redirect to MCQ list page with parameters
             window.location.href = url;
         }
-
-
 
         document.getElementById('content').addEventListener('input', function (e) {
             const current = e.target.value.length;
